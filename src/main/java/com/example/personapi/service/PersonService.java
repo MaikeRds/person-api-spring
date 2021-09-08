@@ -19,10 +19,10 @@ import java.util.stream.Collectors;
 public class PersonService {
 
     private PersonRepository personRepository;
+
     public final PersonMapper personMapper = PersonMapper.INSTANCE;
 
     public MessageResponseDTO createPerson(PersonDTO personDTO){
-
         Person personToSave = this.personMapper.toModel(personDTO);
 
         Person savedPerson = this.personRepository.save(personToSave);
@@ -34,13 +34,25 @@ public class PersonService {
 
     public List<PersonDTO> listAll() {
         List<Person> allPeople = personRepository.findAll();
+
         return allPeople.stream()
                 .map(personMapper::toDTO)
                 .collect(Collectors.toList());
     }
 
     public PersonDTO findById(Long id) throws PersonNotFoundException {
-        Person person = personRepository.findById(id).orElseThrow(() -> new PersonNotFoundException(id));
+        Person person = verifyExists(id);
+
         return personMapper.toDTO(person);
+    }
+
+    public void deleteById(Long id) throws PersonNotFoundException {
+        verifyExists(id);
+
+        personRepository.deleteById(id);
+    }
+
+    private Person verifyExists(Long id) throws PersonNotFoundException {
+        return personRepository.findById(id).orElseThrow(() -> new PersonNotFoundException(id));
     }
 }
