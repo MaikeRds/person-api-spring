@@ -22,6 +22,18 @@ repositories {
 	mavenCentral()
 }
 
+//tasks.withType(Test).configureEach {
+//	useJUnitPlatform()
+//
+//	systemProperty 'java.util.logging.config.file', "${project.buildDir}/resources/test/logging-test.properties"
+//
+//	forkEvery = 1
+//
+//	testLogging {
+//		showStandardStreams = true
+//	}
+//}
+
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-actuator'
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
