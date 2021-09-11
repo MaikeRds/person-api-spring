@@ -2,6 +2,8 @@
 
 Neste coding vamos desenvolver um pequeno sistema para o gerenciamento de pessoas de uma empresa através de uma API REST, criada com o Spring Boot.
 
+![image](.img/2021-09-11-16-15-04.png)
+
 Durante a sessão, serão desenvolvidos e abordados os seguintes tópicos:
 
 * Setup inicial de projeto com o Spring Boot Initialzar
