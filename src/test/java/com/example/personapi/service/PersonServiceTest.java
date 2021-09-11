@@ -21,8 +21,7 @@ import java.util.Optional;
 import static com.example.personapi.utils.PersonUtils.createFakeDTO;
 import static com.example.personapi.utils.PersonUtils.createFakeEntity;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
@@ -46,7 +45,7 @@ public class PersonServiceTest {
 
         MessageResponseDTO expectedSuccessMessage = createExpectedMessageResponse(expectedSavedPerson.getId(), "Created person with ID ");
 
-        MessageResponseDTO successMessage = personService.createPerson(personDTO);
+        MessageResponseDTO successMessage = personService.create(personDTO);
 
         assertEquals(expectedSuccessMessage, successMessage);
     }
@@ -99,4 +98,65 @@ public class PersonServiceTest {
                 .message(s + id)
                 .build();
     }
+
+    @Test
+    void testGivenValidPersonIdAndUpdateInfoThenReturnSuccessOnUpdate() throws PersonNotFoundException {
+        var updatedPersonId = 2L;
+
+        PersonDTO updatePersonDTORequest = createFakeDTO();
+        updatePersonDTORequest.setId(updatedPersonId);
+        updatePersonDTORequest.setLastName("Sousa");
+
+        Person expectedPersonToUpdate = createFakeEntity();
+        expectedPersonToUpdate.setId(updatedPersonId);
+
+        Person expectedPersonUpdated = createFakeEntity();
+        expectedPersonUpdated.setId(updatedPersonId);
+        expectedPersonToUpdate.setLastName(updatePersonDTORequest.getLastName());
+
+        when(personRepository.findById(updatedPersonId)).thenReturn(Optional.of(expectedPersonUpdated));
+        when(personMapper.toModel(updatePersonDTORequest)).thenReturn(expectedPersonUpdated);
+        when(personRepository.save(any(Person.class))).thenReturn(expectedPersonUpdated);
+
+        MessageResponseDTO successMessage = personService.updateById(updatedPersonId, updatePersonDTORequest);
+
+        assertEquals("Person successfully updated with ID 2", successMessage.getMessage());
+    }
+
+    @Test
+    void testGivenInvalidPersonIdAndUpdateInfoThenThrowExceptionOnUpdate(){
+        var invalidPersonId = 1L;
+        PersonDTO updatePersonDTORequest = createFakeDTO();
+        updatePersonDTORequest.setId(invalidPersonId);
+        updatePersonDTORequest.setLastName("Rodrigues updated");
+
+        when(personRepository.findById(invalidPersonId))
+                .thenReturn(Optional.ofNullable(any(Person.class)));
+
+        assertThrows(PersonNotFoundException.class, () -> personService
+                .updateById(invalidPersonId, updatePersonDTORequest));
+    }
+
+    @Test
+    void testGivenValidPersonIdThenReturnSuccessOnDelete() throws PersonNotFoundException {
+        var deletedPersonId = 1L;
+        Person expectedPersonToDelete = createFakeEntity();
+
+        when(personRepository.findById(deletedPersonId)).thenReturn(Optional.of(expectedPersonToDelete));
+        personService.deleteById(deletedPersonId);
+
+        verify(personRepository, times(1)).deleteById(deletedPersonId);
+    }
+
+    @Test
+    void testGivenInvalidPersonIdThenReturnSuccessOnDelete() {
+        var invalidPersonId = 1L;
+
+        when(personRepository.findById(invalidPersonId))
+                .thenReturn(Optional.ofNullable(any(Person.class)));
+
+        assertThrows(PersonNotFoundException.class, () -> personService.deleteById(invalidPersonId));
+    }
+
+
 }
