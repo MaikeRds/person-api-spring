@@ -57,7 +57,7 @@ public class PersonControllerTest {
 
         when(personService.create(expectedPersonDTO)).thenReturn(expectedResponseMessage);
 
-        mockMvc.perform(post(PEOPLE_API_URL_PATH)
+        mockMvc.perform(post(PEOPLE_API_URL_PATH + "/add")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(asJsonString(expectedPersonDTO)))
                 .andExpect(status().isCreated())
@@ -73,7 +73,7 @@ public class PersonControllerTest {
 
         when(personService.findById(expectedValidId)).thenReturn(expectedPersonDTO);
 
-        mockMvc.perform(get(PEOPLE_API_URL_PATH + "/" + expectedValidId)
+        mockMvc.perform(get(PEOPLE_API_URL_PATH + "/show/" + expectedValidId)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id", is(1)))
@@ -89,7 +89,7 @@ public class PersonControllerTest {
 
         when(personService.findById(expectedValidId)).thenThrow(PersonNotFoundException.class);
 
-        mockMvc.perform(get(PEOPLE_API_URL_PATH + "/" + expectedValidId)
+        mockMvc.perform(get(PEOPLE_API_URL_PATH + "/show/" + expectedValidId)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
     }
@@ -103,7 +103,7 @@ public class PersonControllerTest {
 
         when(personService.listAll()).thenReturn(expectedPeopleDTOList);
 
-        mockMvc.perform(get(PEOPLE_API_URL_PATH)
+        mockMvc.perform(get(PEOPLE_API_URL_PATH + "/list")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].id", is(1)))
@@ -119,7 +119,7 @@ public class PersonControllerTest {
 
         when(personService.updateById(expectedValidId, expectedPersonDTO)).thenReturn(expectedResponseMessage);
 
-        mockMvc.perform(put(PEOPLE_API_URL_PATH + "/" + expectedValidId)
+        mockMvc.perform(put(PEOPLE_API_URL_PATH + "/update/" + expectedValidId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(asJsonString(expectedPersonDTO)))
                 .andExpect(status().isOk())
@@ -130,7 +130,7 @@ public class PersonControllerTest {
     void testWhenDELETEIsCalledThenAPersonShouldBeDeleted() throws Exception {
         var expectedValidId = 1L;
 
-        mockMvc.perform(delete(PEOPLE_API_URL_PATH + "/" + expectedValidId)
+        mockMvc.perform(delete(PEOPLE_API_URL_PATH + "/delete/" + expectedValidId)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent());
     }
